@@ -1,62 +1,63 @@
+![gophish logo](https://raw.github.com/gophish/gophish/master/static/images/gophish_purple.png)
+
 OwaSpoof
 =======
 
 Open-Source Phishing Site built with Node JS
 
-[Gophish](https://getgophish.com) is an open-source phishing toolkit designed for businesses and penetration testers. It provides the ability to quickly and easily setup and execute phishing engagements and security awareness training.
+OwaSpoof by [FortieHack](https://fortiehack.com) is an open-source phishing site designed for businesses and penetration testers. It uses a fake OWA Login page to collect credentials from users and store in MongoDB database. It can easily be setup in a matter of minutes.
 
-### Install
+### Install Dependencies
+Install the following dependencies needed for your environment
 
-Installation of Gophish is dead-simple - just download and extract the zip containing the [release for your system](https://github.com/gophish/gophish/releases/), and run the binary. Gophish has binary releases for Windows, Mac, and Linux platforms.
-
-### Building From Source
-**If you are building from source, please note that Gophish requires Go v1.10 or above!**
-
-To build Gophish from source, simply run ```go get github.com/gophish/gophish``` and ```cd``` into the project source directory. Then, run ```go build```. After this, you should have a binary called ```gophish``` in the current directory.
-
-### Docker
-You can also use Gophish via the official Docker container [here](https://hub.docker.com/r/gophish/gophish/).
-
-### Setup
-After running the Gophish binary, open an Internet browser to https://localhost:3333 and login with the default username and password listed in the log output.
-e.g.
-```
-time="2020-07-29T01:24:08Z" level=info msg="Please login with the username admin and the password 4304d5255378177d"
+```sh
+sudo su
+apt update
+apt install docker.io -y
+apt install golang-go -y
+apt install certbot -y
 ```
 
-Releases of Gophish prior to v0.10.1 have a default username of `admin` and password of `gophish`.
 
-### Documentation
+### Clone this Repo
+I have edited the config.json and other files to make it easier for you to get started.
 
-Documentation can be found on our [site](http://getgophish.com/documentation). Find something missing? Let us know by filing an issue!
-
-### Issues
-
-Find a bug? Want more features? Find something missing in the documentation? Let us know! Please don't hesitate to [file an issue](https://github.com/gophish/gophish/issues/new) and we'll get right on it.
-
-### License
+```sh
+git clone https://github.com/okon-emma/gophish-docker.git /opt/gophish
+cd /opt/gophish
 ```
-Gophish - Open-Source Phishing Framework
 
-The MIT License (MIT)
+### Set up Letsencrypt
+We will create a certificate by kickstarting a temporary server to validate our domain. Ensure that you have set this instance IP as an A Record in your DNS. It should map to the URL that you want to generate a certificate for.
 
-Copyright (c) 2013 - 2020 Jordan Wright
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software ("Gophish Community Edition") and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in
-all copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-THE SOFTWARE.
+```sh
+letsencrypt certonly
 ```
+
+Enter you email address; Enter the URL of the domain; and select the option to validate by setting up a temporary server. For other options, choose as you wish. This command will have created 2 files (certificate and key). Copy them to your gophish directory.
+
+```sh
+cp /etc/letsencrypt/live/example.com/fullchain.pem /opt/gophish
+cp /etc/letsencrypt/live/example.com/privkey.pem /opt/gophish
+```
+
+example.com is just for illustration. The path should be same as the URL you used.
+
+
+### Docker Image Build
+Now we will build our image and run it to get our temporary password for the "admin" user. You can as well use your desired tag for the docker image.
+
+```sh
+docker build -t okon/gophish .
+docker run -it -p 3333:3333 -p 443:443 okon/gophish
+```
+
+Once you do a docker run, immediately you will see your running config and also the temporary password. Copy it out and use it to login at the admin panel. It should look like: https://example.com:3333. You will be prompted to change your password immediately after login. Change the password to something you can remember and something strong.
+
+### Start your GoPhish
+Finally, all you need to do is to exit the previous docker container. The container will be stopped. Use this command ```docker ps -a``` to get the container id and start the container.
+
+```sh
+docker start <CONTAINER-ID>
+```
+
