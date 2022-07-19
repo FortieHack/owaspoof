@@ -27,7 +27,7 @@ apt install certbot python3-certbot-nginx -y
 
 ### Clone this Repo
 
-I have edited the config.json and other files to make it easier for you to get started.
+I have edited the config.js and other files to make it easier for you to get started.
 
 ```sh
 git clone https://github.com/FortieHack/owaspoof.git /src/owaspoof
@@ -45,13 +45,13 @@ docker run -e MONGO_INITDB_ROOT_USERNAME=root -e MONGO_INITDB_ROOT_PASSWORD=toor
 
 Now end the docker command that is currently running. And follow this next step to start the mongodb container you have created. It will now run in the background. You will get the id for your container after running the `docker ps -a` command.
 
+NB: You can always edit the ```config.js``` in your root directory before the build to put the connection string of your mongodb if you have it hosted at a different location.
+
 ```sh
 docker start <CONTAINER-ID>
 docker build -t fortiehack/owaspoof .
 docker run -d -p 8080:8080 fortiehack/owaspoof
 ```
-
-NB: You can always edit the config.js in your root directory before the build to put the connection string of your mongodb if you have it hosted at a different location.
 
 ### Configure Reverse Proxy
 
