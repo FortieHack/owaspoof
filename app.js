@@ -21,7 +21,7 @@ app.use(logger("dev"));
 app.use("/", express.static("public"));
 
 // Routes
-app.use("/api", require("./routes/default"));
+app.use("/redirect", require("./routes/tracking"));
 app.use("/api", require("./routes/forward"));
 
 // Connect to MongoDB
